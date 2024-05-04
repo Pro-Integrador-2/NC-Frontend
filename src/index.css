@@ -2,3 +2,11 @@ body {
   margin: 0;
   padding: 0;
 }
+
+.masonry-grid {
+  display: flex;
+}
+.masonry-grid_column {
+  display: flex;
+  flex-direction: column;
+}

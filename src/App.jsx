@@ -1,11 +1,14 @@
 
 import { AppBar, Box, Container, Grid, IconButton, Paper, Toolbar, Typography } from '@mui/material';
-import React from 'react';
-import MyIcon from './assets/imageIcon.png';
 import { format } from 'date-fns';
 import { es } from 'date-fns/locale';
+import React from 'react';
+import MyIcon from './assets/imageIcon.png';
+import NewsCard from './NewsCard';
+import Masonry from 'react-masonry-css';
 function App() {
   const formattedDate = format(new Date(), "EEEE, dd 'de' MMMM 'de' yyyy", { locale: es });
+
   return (
     <Box sx={{ maxWidth: '100%' }}>
       <AppBar position="static">
@@ -30,14 +33,15 @@ function App() {
 
       <Container sx={{ display: 'flex', justifyContent: 'center', minWidth: '100%', paddingInline: "0px !important", minHeight: 'calc(100vh - 70px)' }}>
         <Grid container spacing={2} sx={{ maxWidth: '100%', margin: "0px", height: '100%' }}>
-          <Grid item xs={5}>
+          <Grid item xs={4}>
             <Paper elevation={3} sx={{ height: '100%', padding: "16px" }}>
               <Typography variant="h5" component="div">
                 Noticias Imparciales
               </Typography>
+              <NewsCard />
             </Paper>
           </Grid>
-          <Grid item xs={7} sx={{ display: 'flex', flexDirection: 'column', gap: '16px', padding: "16px" }}>
+          <Grid item xs={8} sx={{ display: 'flex', flexDirection: 'column', gap: '20px', padding: "16px" }}>
             <Typography variant="h5" component="div">
               Noticias por Medio de Comunicación
             </Typography>
@@ -46,9 +50,26 @@ function App() {
                 <Typography variant="h6" component="div">
                   {medio}
                 </Typography>
-                <Typography variant="body1" component="p">
-                  Contenido de noticias de {medio}...
-                </Typography>
+                <Masonry
+                  breakpointCols={{
+                    default: 2,
+                    500: 1
+                  }}
+                  className="masonry-grid"
+                  columnClassName="masonry-grid_column"
+                >
+                  <NewsCard />
+                  <NewsCard />
+                  <NewsCard />
+                  <NewsCard />
+                  <NewsCard />
+                  <NewsCard />
+                  <NewsCard />
+                  <NewsCard />
+                  <NewsCard />
+                  <NewsCard />
+                </Masonry>
+
               </Paper>
             ))}
           </Grid>
