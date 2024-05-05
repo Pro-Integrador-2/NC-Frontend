@@ -1,4 +1,4 @@
-import { AppBar, Box, Container, Grid, IconButton, Paper, Toolbar, Typography, useMediaQuery } from '@mui/material';
+import { AppBar, Avatar, Box, Button, Container, Grid, IconButton, Paper, Toolbar, Typography, useMediaQuery } from '@mui/material';
 import axios from 'axios';
 import { format } from 'date-fns';
 import { es } from 'date-fns/locale';
@@ -11,16 +11,16 @@ function App() {
   const isMobileOrTablet = useMediaQuery('(max-width: 900px)');
   const isMobile = useMediaQuery('(max-width: 400px)');
   const firstRender = useRef(true);
-  let gettingInfo = false;
+  const [newsAnalize, setNewsAnalize] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [done, setDone] = useState(false);
   const [newsInformation, setNewsInformation] = useState([
-    { mediaName: 'La Silla Vacia', endpoint: '/news/la-silla-vacia', news: [] },
-    { mediaName: 'W Radio', endpoint: '/news/w-radio', news: [] },
-    { mediaName: 'Noticias Caracol', endpoint: '/news/noticias-caracol', news: [] },
-    { mediaName: 'Revista Semana', endpoint: '/news/revista-semana', news: [] },
+    { mediaName: 'La Silla Vacia', endpoint: '/news/la-silla-vacia', news: [], logo: "https://pbs.twimg.com/profile_images/938093053344124928/LhoXiFYA_400x400.jpg" },
+    { mediaName: 'Noticias Caracol', endpoint: '/news/noticias-caracol', news: [], logo: "https://pbs.twimg.com/profile_images/1400044712401199108/L1E-ZbwY_400x400.jpg" },
+    { mediaName: 'W Radio', endpoint: '/news/w-radio', news: [], logo: "https://pbs.twimg.com/profile_images/1309308671470559234/3EaRd_iK_400x400.jpg" },
+    { mediaName: 'Revista Semana', endpoint: '/news/revista-semana', news: [], logo: "https://pbs.twimg.com/profile_images/1229471444394029061/AUEHUy1y_400x400.jpg" },
   ])
-  const instance = axios.create({
-    baseURL: 'http://127.0.0.1:5000'
-  });
+
   const NewsCardSkeletons = [
     <NewsCardSkeleton key={1} />,
     <NewsCardSkeleton key={2} />,
@@ -32,15 +32,10 @@ function App() {
 
   useEffect(() => {
     const getNewsInfo = () => {
-      console.log("hola")
       const promisesNews = newsInformation.map((source, index) => {
-        return axios.get(`http://127.0.0.1:5000${source.endpoint}`)
+        return axios.get(`http://127.0.0.1:5000/${source.endpoint}`)
           .then(({ data }) => {
-            console.log(data)
-            setNewsInformation(prevState => {
-              console.log({ prevState })
-              return prevState.map(item => item.mediaName === source.mediaName ? { ...item, news: data } : item);
-            });
+            setNewsInformation(prevState => prevState.map(item => item.mediaName === source.mediaName ? { ...item, news: data } : item));
           })
           .catch(error => {
             console.error('Error fetching data: ', error);
@@ -55,6 +50,13 @@ function App() {
     }
     getNewsInfo()
   }, [])
+
+  const addNewsToAnalize = (news) => {
+    setNewsAnalize([...newsAnalize, news])
+  }
+  const removeNewsToAnalize = (news) => {
+    setNewsAnalize(newsAnalize.filter(item => item.title != news.title && item.link != news.link))
+  }
   return (
     <Box sx={{ maxWidth: '100%' }}>
       <AppBar position="static">
@@ -80,14 +82,28 @@ function App() {
       <Container sx={{ display: 'flex', justifyContent: 'center', minWidth: '100%', paddingInline: "0px !important", minHeight: 'calc(100vh - 70px)' }}>
         <Grid container spacing={2} sx={{ maxWidth: '100%', margin: "0px", height: '100%', justifyContent: "center" }}>
 
-          <Grid item sx={{ minWidth: isMobileOrTablet ? "300px" : "450px", height: "min-content", maxHeight: "2400px", alignItems: "center" }}>
+          <Grid item sx={{ minWidth: isMobileOrTablet ? "300px" : "450px", height: "min-content", maxHeight: "2400px", alignItems: "center", maxWidth: "450px" }}>
             <Paper elevation={3} sx={{ height: '100%', padding: "16px" }}>
-              <Typography variant="h5" component="div">
-                Noticias Imparciales
-              </Typography>
-              <NewsCardSkeleton />
-              <NewsCardSkeleton />
-              <NewsCardSkeleton />
+              <Grid item sx={{
+                display: 'flex', flexDirection: 'row', gap: '20px'
+              }}><Typography variant="h5" component="div">
+                  {done ? "Noticias Imparciales" : "Noticias a imparcializar"}
+                </Typography>
+                <Button variant="outlined" color='secondary' sx={{ padding: "5px" }} disabled={newsAnalize.length === 0}>Imparcializar</Button>
+              </Grid>
+
+              {loading ?
+                <>
+                  <NewsCardSkeleton />
+                  <NewsCardSkeleton />
+                  <NewsCardSkeleton />
+                </> : newsAnalize.length === 0 ?
+                  <Typography paragraph sx={{ marginBottom: "0px" }}>
+                    Selecciona las noticias que desea imparcializar y presiona el botón "Imparcializar".
+                  </Typography> :
+                  newsAnalize.map((newsData, index) => <NewsCard newsData={newsData} key={index} showCardActions={done} />)
+              }
+
             </Paper>
           </Grid>
           <Grid item sx={{
@@ -98,10 +114,15 @@ function App() {
               Noticias por Medio de Comunicación
             </Typography>
             {newsInformation.map((data, index) => (
-              <Paper elevation={3} key={index} sx={{ padding: '16px', flexGrow: 1 }}>
-                <Typography variant="h6" component="div">
-                  {data.mediaName}
-                </Typography>
+              <Paper elevation={3} key={index} sx={{ padding: '16px', flexGrow: 1, gap: '10px', display: "flex", flexDirection: "column" }}>
+                <Grid item sx={{
+                  display: 'flex', flexDirection: 'row', gap: '10px', alignItems: "center"
+                }}>
+                  <Avatar alt={data.mediaName} src={data.logo} />
+                  <Typography variant="h6" component="div">
+                    {data.mediaName}
+                  </Typography>
+                </Grid>
                 <Box maxHeight={"500px"} overflow={"auto"}>
                   <Masonry
                     breakpointCols={{
@@ -112,7 +133,8 @@ function App() {
                     className="masonry-grid"
                     columnClassName="masonry-grid_column"
                   >
-                    {data.news.length === 0 ? NewsCardSkeletons.map(cardSkeleton => cardSkeleton) : data.news.map(newsData => <NewsCard newsData={newsData} />)}
+                    {data.news.length === 0 ? NewsCardSkeletons.map(cardSkeleton => cardSkeleton) :
+                      data.news.map((newsData, index) => <NewsCard newsData={newsData} addNewsToAnalize={addNewsToAnalize} removeNewsToAnalize={removeNewsToAnalize} key={index} showCardActions={true} />)}
                   </Masonry>
                 </Box>
               </Paper>
