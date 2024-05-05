@@ -1,9 +1,8 @@
-import { Box, Button, Card, CardActions, CardContent, CardMedia, Collapse, FormControlLabel, Grid, IconButton, Paper, Skeleton, Switch, Typography } from '@mui/material';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
-import MoreVertIcon from '@mui/icons-material/MoreVert';
-import React, { useEffect, useState } from 'react';
+import { Box, Button, Card, CardActions, CardContent, CardMedia, Collapse, FormControlLabel, Grid, IconButton, Paper, Skeleton, Switch, Typography } from '@mui/material';
 import { styled } from '@mui/material/styles';
-import Iframe from 'react-iframe'
+import React, { useEffect, useState } from 'react';
+import Iframe from 'react-iframe';
 const ExpandMore = styled((props) => {
     const { expand, ...other } = props;
     return <IconButton {...other} />;
@@ -64,7 +63,7 @@ const NewsCard = ({ newsData, addNewsToAnalize, removeNewsToAnalize, showCardAct
                     alt={newsData.title}
                 />}
                 <Box sx={{ display: 'flex', flexDirection: 'column' }}>
-                    <CardContent sx={{ paddingBottom: "0px", paddingInline: "10px", paddingTop: "10px", paddingBottom: "0px !important" }}>
+                    <CardContent sx={{ paddingInline: "10px", paddingTop: "10px", paddingBottom: "0px !important" }}>
                         <Typography gutterBottom variant="h5" component="div" sx={{ marginBottom: "0px" }}>
                             {newsData.title}
                         </Typography>
@@ -76,7 +75,7 @@ const NewsCard = ({ newsData, addNewsToAnalize, removeNewsToAnalize, showCardAct
                     {showCardActions &&
                         <CardActions sx={{ paddingBlock: "0px", paddingInline: "10px", justifyContent: "space-between" }}>
                             <Button size="small" href={newsData.link}>Ver noticia</Button>
-                            <FormControlLabel control={<Switch onChange={handleSwitch} />} label="Imparcializar" />
+                            <FormControlLabel control={<Switch onChange={handleSwitch} color='secondary' />} label="Imparcializar" />
                             <ExpandMore
                                 expand={expanded}
                                 onClick={handleExpandClick}

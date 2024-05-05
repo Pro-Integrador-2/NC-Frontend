@@ -1,4 +1,4 @@
-import { AppBar, Box, Button, Container, Grid, IconButton, Paper, Toolbar, Typography, useMediaQuery } from '@mui/material';
+import { AppBar, Avatar, Box, Button, Container, Grid, IconButton, Paper, Toolbar, Typography, useMediaQuery } from '@mui/material';
 import axios from 'axios';
 import { format } from 'date-fns';
 import { es } from 'date-fns/locale';
@@ -14,16 +14,13 @@ function App() {
   const [newsAnalize, setNewsAnalize] = useState([]);
   const [loading, setLoading] = useState(false);
   const [done, setDone] = useState(false);
-  let gettingInfo = false;
   const [newsInformation, setNewsInformation] = useState([
-    { mediaName: 'La Silla Vacia', endpoint: '/news/la-silla-vacia', news: [] },
-    { mediaName: 'W Radio', endpoint: '/news/w-radio', news: [] },
-    { mediaName: 'Noticias Caracol', endpoint: '/news/noticias-caracol', news: [] },
-    //{ mediaName: 'Revista Semana', endpoint: '/news/revista-semana', news: [] },
+    { mediaName: 'La Silla Vacia', endpoint: '/news/la-silla-vacia', news: [], logo: "https://pbs.twimg.com/profile_images/938093053344124928/LhoXiFYA_400x400.jpg" },
+    { mediaName: 'Noticias Caracol', endpoint: '/news/noticias-caracol', news: [], logo: "https://pbs.twimg.com/profile_images/1400044712401199108/L1E-ZbwY_400x400.jpg" },
+    { mediaName: 'W Radio', endpoint: '/news/w-radio', news: [], logo: "https://pbs.twimg.com/profile_images/1309308671470559234/3EaRd_iK_400x400.jpg" },
+    { mediaName: 'Revista Semana', endpoint: '/news/revista-semana', news: [], logo: "https://pbs.twimg.com/profile_images/1229471444394029061/AUEHUy1y_400x400.jpg" },
   ])
-  const instance = axios.create({
-    baseURL: 'http://127.0.0.1:5000'
-  });
+
   const NewsCardSkeletons = [
     <NewsCardSkeleton key={1} />,
     <NewsCardSkeleton key={2} />,
@@ -36,7 +33,7 @@ function App() {
   useEffect(() => {
     const getNewsInfo = () => {
       const promisesNews = newsInformation.map((source, index) => {
-        return axios.get(`http://127.0.0.1:5000${source.endpoint}`)
+        return axios.get(`http://127.0.0.1:5000/${source.endpoint}`)
           .then(({ data }) => {
             setNewsInformation(prevState => prevState.map(item => item.mediaName === source.mediaName ? { ...item, news: data } : item));
           })
@@ -117,10 +114,15 @@ function App() {
               Noticias por Medio de Comunicación
             </Typography>
             {newsInformation.map((data, index) => (
-              <Paper elevation={3} key={index} sx={{ padding: '16px', flexGrow: 1 }}>
-                <Typography variant="h6" component="div">
-                  {data.mediaName}
-                </Typography>
+              <Paper elevation={3} key={index} sx={{ padding: '16px', flexGrow: 1, gap: '10px', display: "flex", flexDirection: "column" }}>
+                <Grid item sx={{
+                  display: 'flex', flexDirection: 'row', gap: '10px', alignItems: "center"
+                }}>
+                  <Avatar alt={data.mediaName} src={data.logo} />
+                  <Typography variant="h6" component="div">
+                    {data.mediaName}
+                  </Typography>
+                </Grid>
                 <Box maxHeight={"500px"} overflow={"auto"}>
                   <Masonry
                     breakpointCols={{
