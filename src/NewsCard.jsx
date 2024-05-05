@@ -1,4 +1,4 @@
-import { Box, Button, Card, CardActions, CardContent, CardMedia, Collapse, IconButton, Typography } from '@mui/material';
+import { Box, Button, Card, CardActions, CardContent, CardMedia, Collapse, Grid, IconButton, Paper, Skeleton, Typography } from '@mui/material';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import React, { useState } from 'react';
@@ -15,7 +15,7 @@ const ExpandMore = styled((props) => {
 }));
 
 
-const NewsCard = () => {
+const NewsCard = ({ newsData }) => {
     const [expanded, setExpanded] = useState(false);
 
     const handleExpandClick = () => {
@@ -23,25 +23,25 @@ const NewsCard = () => {
     };
 
     return (
-        <Card sx={{ display: 'flex', maxWidth: "400px", alignItems: "center", height: "min-content", flexDirection: "column", marginTop: "16px"}}>
-            <Box sx={{ display: 'flex', flexDirection: 'row' }}>
+        <Card sx={{ display: 'flex', maxWidth: "400px", alignItems: "center", height: "min-content", flexDirection: "column", marginTop: "16px" }}>
+            <Box>
                 <CardMedia
                     component="img"
-                    sx={{ width: "170px", objectFit: "scale-down" }}
-                    image="https://www.noticiasuno.com/wp-content/uploads/2022/04/LOGO_PERFIL-1.png"
-                    alt="Live from space album cover"
+                    sx={{ height: "170px" }}
+                    image={newsData.image}
+                    alt={newsData.title}
                 />
                 <Box sx={{ display: 'flex', flexDirection: 'column' }}>
                     <CardContent sx={{ paddingBottom: "0px", paddingInline: "10px", paddingTop: "10px" }}>
                         <Typography gutterBottom variant="h5" component="div" sx={{ marginBottom: "0px" }}>
-                            Lizard
+                            {newsData.title}
                         </Typography>
                         <Typography variant="body2" color="text.secondary">
-                            Lizards are a widespread group of squamate reptiles, with over 6,000 species, ranging across all continents except Antarctica
+                            {newsData.description}
                         </Typography>
                     </CardContent>
                     <CardActions sx={{ paddingBlock: "0px", paddingInline: "10px" }}>
-                        <Button size="small">Share</Button>
+                        <Button size="small" href={newsData.link}>Ver noticia</Button>
                         <ExpandMore
                             expand={expanded}
                             onClick={handleExpandClick}
@@ -58,13 +58,7 @@ const NewsCard = () => {
             <Collapse in={expanded} timeout="auto" unmountOnExit>
                 <CardContent>
                     <Typography paragraph>
-                        Heat oil in a (14- to 16-inch) paella pan or a large, deep skillet over
-                        medium-high heat. Add chicken, shrimp and chorizo, and cook, stirring
-                        occasionally until lightly browned, 6 to 8 minutes. Transfer shrimp to a
-                        large plate and set aside, leaving chicken and chorizo in the pan. Add
-                        pimentón, bay leaves, garlic, tomatoes, onion, salt and pepper, and cook,
-                        stirring often until thickened and fragrant, about 10 minutes. Add
-                        saffron broth and remaining 4 1/2 cups chicken broth; bring to a boil.
+                        {newsData.text}
                     </Typography>
                 </CardContent>
             </Collapse>
@@ -72,4 +66,17 @@ const NewsCard = () => {
     );
 }
 
+export const NewsCardSkeleton = () => {
+    return (
+        <Paper sx={{ display: 'flex', maxWidth: "400px", height: "min-content", flexDirection: "column", marginTop: "16px", minWidth: "300px" }}>
+            <Skeleton variant="rectangular" height={"170px"} />
+            <Grid >
+                <Typography gutterBottom variant="h5" component="div" sx={{ marginBottom: "0px", marginInline: "10px" }}>
+                    <Skeleton height={"50px"} />
+                </Typography>
+                <Skeleton variant="rectangular" height={"70px"} sx={{ margin: "10px", marginTop: "0px" }} />
+            </Grid>
+        </Paper>
+    )
+}
 export default NewsCard
