@@ -1,4 +1,4 @@
-import { AppBar, Box, Container, Grid, IconButton, Paper, Toolbar, Typography, useMediaQuery } from '@mui/material';
+import { AppBar, Box, Button, Container, Grid, IconButton, Paper, Toolbar, Typography, useMediaQuery } from '@mui/material';
 import axios from 'axios';
 import { format } from 'date-fns';
 import { es } from 'date-fns/locale';
@@ -11,12 +11,15 @@ function App() {
   const isMobileOrTablet = useMediaQuery('(max-width: 900px)');
   const isMobile = useMediaQuery('(max-width: 400px)');
   const firstRender = useRef(true);
+  const [newsAnalize, setNewsAnalize] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [done, setDone] = useState(false);
   let gettingInfo = false;
   const [newsInformation, setNewsInformation] = useState([
     { mediaName: 'La Silla Vacia', endpoint: '/news/la-silla-vacia', news: [] },
     { mediaName: 'W Radio', endpoint: '/news/w-radio', news: [] },
     { mediaName: 'Noticias Caracol', endpoint: '/news/noticias-caracol', news: [] },
-    { mediaName: 'Revista Semana', endpoint: '/news/revista-semana', news: [] },
+    //{ mediaName: 'Revista Semana', endpoint: '/news/revista-semana', news: [] },
   ])
   const instance = axios.create({
     baseURL: 'http://127.0.0.1:5000'
@@ -32,15 +35,10 @@ function App() {
 
   useEffect(() => {
     const getNewsInfo = () => {
-      console.log("hola")
       const promisesNews = newsInformation.map((source, index) => {
         return axios.get(`http://127.0.0.1:5000${source.endpoint}`)
           .then(({ data }) => {
-            console.log(data)
-            setNewsInformation(prevState => {
-              console.log({ prevState })
-              return prevState.map(item => item.mediaName === source.mediaName ? { ...item, news: data } : item);
-            });
+            setNewsInformation(prevState => prevState.map(item => item.mediaName === source.mediaName ? { ...item, news: data } : item));
           })
           .catch(error => {
             console.error('Error fetching data: ', error);
@@ -55,6 +53,13 @@ function App() {
     }
     getNewsInfo()
   }, [])
+
+  const addNewsToAnalize = (news) => {
+    setNewsAnalize([...newsAnalize, news])
+  }
+  const removeNewsToAnalize = (news) => {
+    setNewsAnalize(newsAnalize.filter(item => item.title != news.title && item.link != news.link))
+  }
   return (
     <Box sx={{ maxWidth: '100%' }}>
       <AppBar position="static">
@@ -80,14 +85,28 @@ function App() {
       <Container sx={{ display: 'flex', justifyContent: 'center', minWidth: '100%', paddingInline: "0px !important", minHeight: 'calc(100vh - 70px)' }}>
         <Grid container spacing={2} sx={{ maxWidth: '100%', margin: "0px", height: '100%', justifyContent: "center" }}>
 
-          <Grid item sx={{ minWidth: isMobileOrTablet ? "300px" : "450px", height: "min-content", maxHeight: "2400px", alignItems: "center" }}>
+          <Grid item sx={{ minWidth: isMobileOrTablet ? "300px" : "450px", height: "min-content", maxHeight: "2400px", alignItems: "center", maxWidth: "450px" }}>
             <Paper elevation={3} sx={{ height: '100%', padding: "16px" }}>
-              <Typography variant="h5" component="div">
-                Noticias Imparciales
-              </Typography>
-              <NewsCardSkeleton />
-              <NewsCardSkeleton />
-              <NewsCardSkeleton />
+              <Grid item sx={{
+                display: 'flex', flexDirection: 'row', gap: '20px'
+              }}><Typography variant="h5" component="div">
+                  {done ? "Noticias Imparciales" : "Noticias a imparcializar"}
+                </Typography>
+                <Button variant="outlined" color='secondary' sx={{ padding: "5px" }} disabled={newsAnalize.length === 0}>Imparcializar</Button>
+              </Grid>
+
+              {loading ?
+                <>
+                  <NewsCardSkeleton />
+                  <NewsCardSkeleton />
+                  <NewsCardSkeleton />
+                </> : newsAnalize.length === 0 ?
+                  <Typography paragraph sx={{ marginBottom: "0px" }}>
+                    Selecciona las noticias que desea imparcializar y presiona el botón "Imparcializar".
+                  </Typography> :
+                  newsAnalize.map((newsData, index) => <NewsCard newsData={newsData} key={index} showCardActions={done} />)
+              }
+
             </Paper>
           </Grid>
           <Grid item sx={{
@@ -112,7 +131,8 @@ function App() {
                     className="masonry-grid"
                     columnClassName="masonry-grid_column"
                   >
-                    {data.news.length === 0 ? NewsCardSkeletons.map(cardSkeleton => cardSkeleton) : data.news.map(newsData => <NewsCard newsData={newsData} />)}
+                    {data.news.length === 0 ? NewsCardSkeletons.map(cardSkeleton => cardSkeleton) :
+                      data.news.map((newsData, index) => <NewsCard newsData={newsData} addNewsToAnalize={addNewsToAnalize} removeNewsToAnalize={removeNewsToAnalize} key={index} showCardActions={true} />)}
                   </Masonry>
                 </Box>
               </Paper>
