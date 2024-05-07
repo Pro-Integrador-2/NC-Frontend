@@ -23,15 +23,20 @@ const extractIframe = (text) => {
     return null;
 };
 
+
 const NewsCard = ({ newsData, addNewsToAnalize, removeNewsToAnalize, showCardActions, hideChecked }) => {
     const [expanded, setExpanded] = useState(false);
     const [content, setContent] = useState('');
     const [iframe, setIframe] = useState(null);
-    const [showSelect, setShowSelect] = useState(!hideChecked);
+    const [showSelect, setShowSelect] = useState(false);
     const handleExpandClick = () => {
         setShowSelect(false)
         setExpanded(!expanded);
     };
+    useEffect(() => {
+        setShowSelect(false);
+    }, [hideChecked]);
+    
     useEffect(() => {
         const iframeExtracted = extractIframe(newsData.text);
         const text = iframeExtracted ? newsData.text.replace(iframeExtracted, '').replace("Compartir\nEl código iframe se ha copiado en el portapapeles", '') : newsData.text;
@@ -47,8 +52,7 @@ const NewsCard = ({ newsData, addNewsToAnalize, removeNewsToAnalize, showCardAct
         if (iframeExtracted && iframeSRC[1]) {
             setIframe(iframeSRC[1]);
         }
-        setShowSelect(!!hideChecked)
-        console.log(hideChecked)
+
     }, [newsData]);
     const handleSwitch = ({ target }) => {
         setShowSelect(target.checked)
