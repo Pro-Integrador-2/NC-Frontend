@@ -7,6 +7,7 @@ import Masonry from 'react-masonry-css';
 import NewsCard, { NewsCardSkeleton } from './NewsCard';
 import MyIcon from './assets/imageIcon.png';
 import BalanceIcon from '@mui/icons-material/Balance';
+import DeleteIcon from '@mui/icons-material/Delete';
 function App() {
   const formattedDate = format(new Date(), "EEEE, dd 'de' MMMM 'de' yyyy", { locale: es });
   const isMobileOrTablet = useMediaQuery('(max-width: 900px)');
@@ -61,7 +62,7 @@ function App() {
   }
   const AnalizeNews = async (e) => {
     setLoading(true)
-    await axios.post(`https://nc-backend-orbe.onrender.com`, { news: newsAnalize })
+    await axios.post(`https://nc-backend-orbe.onrender.com/news/procesar-noticias`, { news: newsAnalize })
       .then(({ data }) => {
         setNewsAnalize(JSON.parse(data.response.replace(/'/g, '"')))
         setDone(true)
@@ -71,8 +72,8 @@ function App() {
       });
     setLoading(false)
   }
-  const cleanNews = () => { 
-    setNewsAnalize([]); 
+  const cleanNews = () => {
+    setNewsAnalize([]);
     setDone(false);
     setHideChecked(prev => !prev);
   }
@@ -103,14 +104,19 @@ function App() {
         <Grid container spacing={2} sx={{ maxWidth: '100%', margin: "0px", height: '100%', justifyContent: "center" }}>
 
           <Grid item sx={{ minWidth: isMobileOrTablet ? "300px" : "460px", height: "min-content", maxHeight: "2400px", alignItems: "center", maxWidth: "450px" }}>
-            <Paper elevation={3} sx={{ height: '100%', padding: "16px" }}>
+            <Paper elevation={3} sx={{
+              height: '100%', padding: "16px", display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+              gap: "8px"
+            }}>
               <Grid item sx={{
                 display: 'flex', flexDirection: 'row', gap: '20px'
               }}>
                 <Typography variant="h5" component="div">
                   {done ? "Noticias Imparciales" : "Noticias a imparcializar"}
                 </Typography>
-                <Button variant="contained" color='secondary'  startIcon={<BalanceIcon />} onClick={AnalizeNews} sx={{ padding: "5px" }} disabled={newsAnalize.length === 0}>Imparcializar</Button>
+                <Button variant="contained" color='secondary' startIcon={<BalanceIcon />} onClick={AnalizeNews} sx={{ paddingInline: "5px", paddingBlock: "5px" }} disabled={newsAnalize.length === 0}>Imparcializar</Button>
               </Grid>
 
               {loading ?
@@ -124,7 +130,7 @@ function App() {
                   </Typography> :
                   <>
                     {newsAnalize.map((newsData, index) => done ? <NewsCard newsData={newsData} key={index} showCardActions={true} /> : <NewsCard newsData={newsData} key={index} showCardActions={done} />)}
-                    <Button fullWidth variant="outlined" color='secondary' onClick={cleanNews} sx={{ padding: "5px", maxWidth: "100px" }} disabled={newsAnalize.length === 0}>Limpiar</Button>
+                    <Button fullWidth variant="outlined" startIcon={<DeleteIcon />} color='secondary' onClick={cleanNews} sx={{ padding: "5px", maxWidth: "100px" }} disabled={newsAnalize.length === 0}>Limpiar</Button>
                   </>
               }
 
@@ -158,8 +164,8 @@ function App() {
                     columnClassName="masonry-grid_column"
                   >
                     {data.news.length === 0 ? NewsCardSkeletons.map(cardSkeleton => cardSkeleton) :
-                      data.news.map((newsData, index) => 
-                      <NewsCard newsData={newsData} addNewsToAnalize={addNewsToAnalize} removeNewsToAnalize={removeNewsToAnalize} key={index} showCardActions={true} hideChecked={hideChecked}/>)}
+                      data.news.map((newsData, index) =>
+                        <NewsCard newsData={newsData} addNewsToAnalize={addNewsToAnalize} removeNewsToAnalize={removeNewsToAnalize} key={index} showCardActions={true} hideChecked={hideChecked} />)}
                   </Masonry>
                 </Box>
               </Paper>
