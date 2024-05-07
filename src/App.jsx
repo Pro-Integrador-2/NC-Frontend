@@ -1,7 +1,7 @@
 import { AppBar, Avatar, Box, Button, Container, Grid, IconButton, Paper, Toolbar, Typography, useMediaQuery } from '@mui/material';
 import axios from 'axios';
 import { format } from 'date-fns';
-import { es } from 'date-fns/locale';
+import { da, es } from 'date-fns/locale';
 import React, { useEffect, useRef, useState } from 'react';
 import Masonry from 'react-masonry-css';
 import NewsCard, { NewsCardSkeleton } from './NewsCard';
@@ -13,6 +13,8 @@ function App() {
   const firstRender = useRef(true);
   const [newsAnalize, setNewsAnalize] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [hideChecked, setHideChecked] = useState(false);
+
   const [done, setDone] = useState(false);
   const [newsInformation, setNewsInformation] = useState([
     { mediaName: 'La Silla Vacia', endpoint: '/news/la-silla-vacia', news: [], logo: "https://pbs.twimg.com/profile_images/938093053344124928/LhoXiFYA_400x400.jpg" },
@@ -33,16 +35,15 @@ function App() {
   useEffect(() => {
     const getNewsInfo = () => {
       const promisesNews = newsInformation.map((source, index) => {
-        return axios.get(`http://127.0.0.1:5000/${source.endpoint}`)
+        if (newsInformation[index].news.length !== 0) return;
+        return axios.get(`https://nc-backend-orbe.onrender.com/${source.endpoint}`)
           .then(({ data }) => {
             setNewsInformation(prevState => prevState.map(item => item.mediaName === source.mediaName ? { ...item, news: data } : item));
           })
           .catch(error => {
             console.error('Error fetching data: ', error);
-
           });
       });
-      //console.log(promisesNews)
     }
     if (firstRender.current) {
       firstRender.current = false;
@@ -57,6 +58,24 @@ function App() {
   const removeNewsToAnalize = (news) => {
     setNewsAnalize(newsAnalize.filter(item => item.title != news.title && item.link != news.link))
   }
+  const AnalizeNews = async (e) => {
+    setLoading(true)
+    await axios.post(`https://nc-backend-orbe.onrender.com`, { news: newsAnalize })
+      .then(({ data }) => {
+        setNewsAnalize(JSON.parse(data.response.replace(/'/g, '"')))
+        setDone(true)
+      })
+      .catch(error => {
+        console.error('Error fetching data: ', error);
+      });
+    setLoading(false)
+  }
+  const cleanNews = () => { 
+    setNewsAnalize([]); 
+    setDone(false)
+    setHideChecked(true)
+  }
+
   return (
     <Box sx={{ maxWidth: '100%' }}>
       <AppBar position="static">
@@ -86,10 +105,11 @@ function App() {
             <Paper elevation={3} sx={{ height: '100%', padding: "16px" }}>
               <Grid item sx={{
                 display: 'flex', flexDirection: 'row', gap: '20px'
-              }}><Typography variant="h5" component="div">
+              }}>
+                <Typography variant="h5" component="div">
                   {done ? "Noticias Imparciales" : "Noticias a imparcializar"}
                 </Typography>
-                <Button variant="outlined" color='secondary' sx={{ padding: "5px" }} disabled={newsAnalize.length === 0}>Imparcializar</Button>
+                <Button variant="contained" color='secondary' onClick={AnalizeNews} sx={{ padding: "5px" }} disabled={newsAnalize.length === 0}>Imparcializar</Button>
               </Grid>
 
               {loading ?
@@ -101,7 +121,10 @@ function App() {
                   <Typography paragraph sx={{ marginBottom: "0px" }}>
                     Selecciona las noticias que desea imparcializar y presiona el botón "Imparcializar".
                   </Typography> :
-                  newsAnalize.map((newsData, index) => <NewsCard newsData={newsData} key={index} showCardActions={done} />)
+                  <>
+                    {newsAnalize.map((newsData, index) => done ? <NewsCard newsData={newsData} key={index} showCardActions={true} /> : <NewsCard newsData={newsData} key={index} showCardActions={done} />)}
+                    <Button fullWidth variant="outlined" color='secondary' onClick={cleanNews} sx={{ padding: "5px", maxWidth: "100px" }} disabled={newsAnalize.length === 0}>Limpiar</Button>
+                  </>
               }
 
             </Paper>
@@ -134,7 +157,8 @@ function App() {
                     columnClassName="masonry-grid_column"
                   >
                     {data.news.length === 0 ? NewsCardSkeletons.map(cardSkeleton => cardSkeleton) :
-                      data.news.map((newsData, index) => <NewsCard newsData={newsData} addNewsToAnalize={addNewsToAnalize} removeNewsToAnalize={removeNewsToAnalize} key={index} showCardActions={true} />)}
+                      data.news.map((newsData, index) => 
+                      <NewsCard newsData={newsData} addNewsToAnalize={addNewsToAnalize} removeNewsToAnalize={removeNewsToAnalize} key={index} showCardActions={true} hideChecked={!hideChecked}/>)}
                   </Masonry>
                 </Box>
               </Paper>
