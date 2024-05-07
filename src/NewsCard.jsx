@@ -135,7 +135,7 @@ const NewsCard = ({ newsData, addNewsToAnalize, removeNewsToAnalize, showCardAct
  */
 export const NewsCardSkeleton = () => {
     return (
-        <Paper sx={{ display: 'flex', maxWidth: "400px", height: "min-content", flexDirection: "column", marginTop: "16px", minWidth: "300px" }}>
+        <Paper sx={{ display: 'flex', maxWidth: "400px", height: "min-content", flexDirection: "column", marginTop: "16px", minWidth: "300px" }}  data-testid="news-card-skeleton">
             <Skeleton variant="rectangular" height={"170px"} />
             <Grid >
                 <Typography gutterBottom variant="h5" component="div" sx={{ marginBottom: "0px", marginInline: "10px" }}>
