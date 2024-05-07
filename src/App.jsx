@@ -8,6 +8,19 @@ import NewsCard, { NewsCardSkeleton } from './NewsCard';
 import MyIcon from './assets/imageIcon.png';
 import BalanceIcon from '@mui/icons-material/Balance';
 import DeleteIcon from '@mui/icons-material/Delete';
+
+/**
+ * Componente principal App.
+ * 
+ * - Solicita al backend las noticias más recientes y las muestra organizadas por medio de comunicación.
+ * - Permite al usuario seleccionar noticias para imparcializar.
+ * - Envía las noticias seleccionadas al backend para su procesamiento.
+ * - Muestra las noticias imparcializadas tras el procesamiento.
+ * 
+ * Utiliza Material-UI para la interfaz de usuario, axios para las solicitudes HTTP, y date-fns para mostrar la fecha actual formateada.
+ * Incluye manejo de estado con useState para controlar las noticias, la carga y el estado de imparcialización.
+ * Usa useEffect para realizar la carga inicial de datos y useRef para evitar recargas innecesarias en el primer render.
+ */
 function App() {
   const formattedDate = format(new Date(), "EEEE, dd 'de' MMMM 'de' yyyy", { locale: es });
   const isMobileOrTablet = useMediaQuery('(max-width: 900px)');

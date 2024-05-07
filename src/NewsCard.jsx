@@ -3,6 +3,10 @@ import { Box, Button, Card, CardActions, CardContent, CardMedia, Collapse, FormC
 import { styled } from '@mui/material/styles';
 import React, { useEffect, useState } from 'react';
 import Iframe from 'react-iframe';
+
+/** 
+* Componente ExpandMore: Controla la expansión del detalle de las noticias en un Card.
+*/
 const ExpandMore = styled((props) => {
     const { expand, ...other } = props;
     return <IconButton {...other} />;
@@ -14,6 +18,11 @@ const ExpandMore = styled((props) => {
     }),
 }));
 
+/**
+ * Función extractIframe: Extrae el contenido de un iframe dentro del texto de la noticia.
+ * @param {string} text - Texto que puede contener un iframe.
+ * @returns {string|null} - Retorna el iframe extraído o null si no encuentra ninguno.
+ */
 const extractIframe = (text) => {
     const iframeRegex = /<iframe.*?src="(.*?)".*?<\/iframe>/;
     const match = iframeRegex.exec(text);
@@ -24,6 +33,15 @@ const extractIframe = (text) => {
 };
 
 
+/**
+ * Componente NewsCard: Muestra la información detallada de una noticia.
+ * Permite al usuario seleccionar noticias para imparcializar y las envía al backend para su procesamiento.
+ * @param {object} newsData - Datos de la noticia.
+ * @param {function} addNewsToAnalize - Función para agregar noticias a la lista de análisis.
+ * @param {function} removeNewsToAnalize - Función para remover noticias de la lista de análisis.
+ * @param {boolean} showCardActions - Indica si se deben mostrar acciones adicionales en la tarjeta.
+ * @param {boolean} hideChecked - Controla la visibilidad del selector para imparcializar.
+ */
 const NewsCard = ({ newsData, addNewsToAnalize, removeNewsToAnalize, showCardActions, hideChecked }) => {
     const [expanded, setExpanded] = useState(false);
     const [content, setContent] = useState('');
@@ -112,6 +130,9 @@ const NewsCard = ({ newsData, addNewsToAnalize, removeNewsToAnalize, showCardAct
     );
 }
 
+/**
+ * Componente NewsCardSkeleton: Proporciona un esqueleto para las NewsCard mientras las noticias están cargando.
+ */
 export const NewsCardSkeleton = () => {
     return (
         <Paper sx={{ display: 'flex', maxWidth: "400px", height: "min-content", flexDirection: "column", marginTop: "16px", minWidth: "300px" }}>
