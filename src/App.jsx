@@ -60,10 +60,6 @@ function App() {
           });
       });
     }
-    if (firstRender.current) {
-      firstRender.current = false;
-      return;
-    }
     getNewsInfo()
   }, [])
 
