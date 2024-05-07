@@ -23,11 +23,13 @@ const extractIframe = (text) => {
     return null;
 };
 
-const NewsCard = ({ newsData, addNewsToAnalize, removeNewsToAnalize, showCardActions }) => {
+const NewsCard = ({ newsData, addNewsToAnalize, removeNewsToAnalize, showCardActions, hideChecked }) => {
     const [expanded, setExpanded] = useState(false);
     const [content, setContent] = useState('');
     const [iframe, setIframe] = useState(null);
+    const [showSelect, setShowSelect] = useState(!hideChecked);
     const handleExpandClick = () => {
+        setShowSelect(false)
         setExpanded(!expanded);
     };
     useEffect(() => {
@@ -45,8 +47,11 @@ const NewsCard = ({ newsData, addNewsToAnalize, removeNewsToAnalize, showCardAct
         if (iframeExtracted && iframeSRC[1]) {
             setIframe(iframeSRC[1]);
         }
+        setShowSelect(!!hideChecked)
+        console.log(hideChecked)
     }, [newsData]);
     const handleSwitch = ({ target }) => {
+        setShowSelect(target.checked)
         if (target.checked) {
             addNewsToAnalize(newsData)
         } else {
@@ -61,6 +66,7 @@ const NewsCard = ({ newsData, addNewsToAnalize, removeNewsToAnalize, showCardAct
                     sx={{ height: "170px", maxWidth: showCardActions ? "100%" : '170px', objectFit: 'fill' }}
                     image={newsData.image}
                     alt={newsData.title}
+                    loading='lazy'
                 />}
                 <Box sx={{ display: 'flex', flexDirection: 'column' }}>
                     <CardContent sx={{ paddingInline: "10px", paddingTop: "10px", paddingBottom: "0px !important" }}>
@@ -75,7 +81,7 @@ const NewsCard = ({ newsData, addNewsToAnalize, removeNewsToAnalize, showCardAct
                     {showCardActions &&
                         <CardActions sx={{ paddingBlock: "0px", paddingInline: "10px", justifyContent: "space-between" }}>
                             <Button size="small" href={newsData.link}>Ver noticia</Button>
-                            <FormControlLabel control={<Switch onChange={handleSwitch} color='secondary' />} label="Imparcializar" />
+                            {addNewsToAnalize && <FormControlLabel control={<Switch inputProps={{ 'aria-label': 'controlled' }} checked={showSelect} onChange={handleSwitch} color='secondary' />} label="Imparcializar" />}
                             <ExpandMore
                                 expand={expanded}
                                 onClick={handleExpandClick}
