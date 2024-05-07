@@ -1,0 +1,16 @@
+body {
+  margin: 0;
+  padding: 0;
+}
+
+.masonry-grid {
+  display: flex;
+  max-height: "400px";
+  overflow: "auto";
+}
+.masonry-grid_column {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-width: "450px";
+}
